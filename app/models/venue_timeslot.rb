@@ -1,0 +1,2 @@
+class VenueTimeslot < ApplicationRecord
+end

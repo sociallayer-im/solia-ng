@@ -1,0 +1,2 @@
+class PointTransfer < ApplicationRecord
+end
