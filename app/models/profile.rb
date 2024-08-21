@@ -1,3 +1,6 @@
+require "jwt"
+$hmac_secret = ENV["JWT_SECRET_KEY"]
+
 class Profile < ApplicationRecord
   belongs_to :group, optional: true
 
@@ -27,4 +30,17 @@ class Profile < ApplicationRecord
   has_many :contact_targets, :through => :source_contacts, :source => "target", foreign_key: "source_id"
 
   enum status: { active: 'active', freezed: 'freezed' }
+
+  def gen_auth_token
+    payload = {
+      id: self.id,
+      address_type: "email",
+      "https://hasura.io/jwt/claims": {
+        "x-hasura-default-role": "user",
+        "x-hasura-allowed-roles": ["user"],
+        "x-hasura-user-id": self.id.to_s,
+      }
+    }
+    auth_token = JWT.encode payload, $hmac_secret, "HS256"
+  end
 end

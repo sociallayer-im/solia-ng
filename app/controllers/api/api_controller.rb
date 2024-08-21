@@ -38,19 +38,6 @@ class ApiController < ApplicationController
     content = Sanitize.fragment(content, Sanitize::Config::RELAXED)
   end
 
-  def self.encode_token(id)
-    payload = {
-      id: id,
-      address_type: "wallet",
-      "https://hasura.io/jwt/claims": {
-        "x-hasura-default-role": "user",
-        "x-hasura-allowed-roles": ["user"],
-        "x-hasura-user-id": id.to_s,
-      }
-    }
-    auth_token = JWT.encode payload, $hmac_secret, "HS256"
-  end
-
   def current_profile
     return Profile.find_by(address: @address) if @address
 
