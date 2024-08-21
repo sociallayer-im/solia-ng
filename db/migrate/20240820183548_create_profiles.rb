@@ -8,7 +8,7 @@ class CreateProfiles < ActiveRecord::Migration[7.2]
       t.string :sol_address
       t.string :chain
       t.string :zupass
-      t.string :status
+      t.string :status, default: "active"
       t.string :image_url
       t.string :nickname
       t.string :about

@@ -7,7 +7,7 @@ class CreateGroups < ActiveRecord::Migration[7.2]
       t.string :nickname
       t.text :about
       t.integer :parent_id
-      t.string :status
+      t.string :status, default: "active"
       t.string :tags, array: true
       t.string :event_taglist, array: true
       t.string :venue_taglist, array: true
