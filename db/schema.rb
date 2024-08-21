@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_150654) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_164905) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "activities", force: :cascade do |t|
+    t.integer "item_type"
+    t.integer "item_class_id"
+    t.integer "item_id"
+    t.integer "initiator_id"
+    t.integer "target_type"
+    t.integer "target_id"
+    t.string "context"
+    t.string "action"
+    t.string "data"
+    t.string "memo"
+    t.integer "receiver_id"
+    t.string "receiver_type", default: "id"
+    t.string "receiver_address"
+    t.boolean "has_read", default: false
+    t.datetime "created_at", null: false
+  end
 
   create_table "badge_classes", force: :cascade do |t|
     t.string "domain"
@@ -103,6 +121,51 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_150654) do
     t.string "status", default: "normal", null: false, comment: "normal | freezed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "event_roles", force: :cascade do |t|
+    t.integer "event_id"
+    t.integer "profile_id"
+    t.string "email"
+    t.string "nickname"
+    t.string "image_url"
+    t.string "role"
+    t.string "about"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.string "title"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.string "timezone"
+    t.string "meeting_url"
+    t.integer "venue_id"
+    t.string "location"
+    t.string "formatted_address"
+    t.text "location_viewport"
+    t.decimal "geo_lat", precision: 10, scale: 6
+    t.decimal "geo_lng", precision: 10, scale: 6
+    t.integer "owner_id"
+    t.integer "group_id"
+    t.string "cover_url"
+    t.string "status", default: "published", null: false
+    t.boolean "require_approval"
+    t.text "content"
+    t.string "tags", array: true
+    t.integer "max_participant"
+    t.integer "min_participant"
+    t.integer "participants_count", default: 0
+    t.integer "badge_class_id"
+    t.integer "recurring_event_id"
+    t.string "event_type", comment: "event"
+    t.string "display", default: "normal", comment: "normal | hidden | pinned"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "external_url"
+    t.text "notes"
+    t.jsonb "extra"
   end
 
   create_table "group_invites", force: :cascade do |t|
