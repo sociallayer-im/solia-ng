@@ -1,0 +1,2 @@
+module Api::TicketHelper
+end
