@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_164905) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -158,7 +158,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_164905) do
     t.integer "min_participant"
     t.integer "participants_count", default: 0
     t.integer "badge_class_id"
-    t.integer "recurring_event_id"
+    t.integer "recurring_id"
     t.string "event_type", comment: "event"
     t.string "display", default: "normal", comment: "normal | hidden | pinned"
     t.datetime "created_at", null: false
@@ -361,7 +361,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_164905) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "recurring_events", force: :cascade do |t|
+  create_table "recurrings", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
     t.string "interval"

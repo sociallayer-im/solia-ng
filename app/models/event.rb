@@ -3,7 +3,7 @@ class Event < ApplicationRecord
   belongs_to :group, optional: true
   belongs_to :venue, optional: true
   belongs_to :badge_class, optional: true
-  belongs_to :recurring_event, optional: true
+  belongs_to :recurring, optional: true
   has_many :participants, dependent: :delete_all
   has_many :tickets, dependent: :delete_all
   has_many :ticket_items, dependent: :delete_all

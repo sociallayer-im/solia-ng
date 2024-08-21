@@ -23,7 +23,7 @@ class CreateEvents < ActiveRecord::Migration[7.2]
       t.integer "min_participant"
       t.integer "participants_count", default: 0
       t.integer "badge_class_id"
-      t.integer "recurring_event_id"
+      t.integer "recurring_id"
       t.string "event_type", comment: "event"
       t.string "display", default: "normal", comment: "normal | hidden | pinned"
       t.datetime "created_at", null: false

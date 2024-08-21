@@ -1,6 +1,6 @@
 require "test_helper"
 
-class RecurringEventTest < ActiveSupport::TestCase
+class RecurringTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
