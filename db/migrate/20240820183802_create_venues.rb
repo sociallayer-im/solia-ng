@@ -17,7 +17,6 @@ class CreateVenues < ActiveRecord::Migration[7.2]
       t.integer "capacity"
       t.boolean "require_approval", default: false
       t.string "tags", array: true
-      t.boolean "removed"
       t.string "visibility", comment: "all | manager | none"
     end
   end

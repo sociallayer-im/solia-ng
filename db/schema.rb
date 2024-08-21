@@ -10,9 +10,59 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_150654) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "badge_classes", force: :cascade do |t|
+    t.string "domain"
+    t.string "name"
+    t.string "title"
+    t.jsonb "metadata"
+    t.text "content"
+    t.string "image_url"
+    t.integer "creator_id"
+    t.integer "group_id"
+    t.integer "counter", default: 1
+    t.string "tags", array: true
+    t.boolean "transferable", default: false, null: false
+    t.boolean "revocable", default: false, null: false
+    t.boolean "weighted", default: false, null: false
+    t.boolean "encrypted", default: false, null: false
+    t.string "permissions", default: [], array: true
+    t.string "chain_index"
+    t.string "chain_space"
+    t.string "chain_txhash"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "status", default: "active"
+    t.string "display", default: "normal"
+    t.index ["creator_id"], name: "index_badge_classes_on_creator_id"
+  end
+
+  create_table "badges", force: :cascade do |t|
+    t.string "domain"
+    t.integer "index"
+    t.integer "badge_class_id"
+    t.integer "creator_id"
+    t.integer "owner_id"
+    t.string "image_url"
+    t.string "title"
+    t.jsonb "metadata"
+    t.text "content"
+    t.string "status", default: "minted", null: false, comment: "minted | burned"
+    t.string "display", default: "normal"
+    t.string "tags", array: true
+    t.integer "value", default: 0
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.string "chain_index"
+    t.string "chain_space"
+    t.string "chain_txhash"
+    t.integer "voucher_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "comments", force: :cascade do |t|
     t.string "item_type"
@@ -24,7 +74,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
     t.string "title"
     t.text "content"
     t.string "icon_url"
-    t.string "content_type", default: "plain/text"
+    t.string "content_type", default: "text/plain"
     t.integer "reply_parent_id"
     t.integer "edit_parent_id"
     t.datetime "created_at", null: false
@@ -78,7 +128,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
     t.string "nickname"
     t.text "about"
     t.integer "parent_id"
-    t.string "status"
+    t.string "status", default: "active"
     t.string "tags", array: true
     t.string "event_taglist", array: true
     t.string "venue_taglist", array: true
@@ -126,7 +176,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
   create_table "memberships", force: :cascade do |t|
     t.integer "profile_id"
     t.integer "group_id"
-    t.string "role", default: "member", null: false, comment: "member | issuer | event_manager | guardian | manager | owner"
+    t.string "role", default: "member", null: false, comment: "member | operator | guardian | manager | owner"
     t.string "status", default: "normal", null: false, comment: "normal | freezed"
     t.jsonb "data"
     t.datetime "created_at", null: false
@@ -189,7 +239,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
   create_table "point_transfers", force: :cascade do |t|
     t.integer "point_class_id"
     t.integer "sender_id"
-    t.integer "owner_id"
+    t.integer "receiver_id"
     t.integer "value", default: 0
     t.string "status", default: "pending", null: false, comment: "pending | accepted | rejected | revoked"
     t.datetime "created_at", null: false
@@ -212,7 +262,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
     t.string "sol_address"
     t.string "chain"
     t.string "zupass"
-    t.string "status"
+    t.string "status", default: "active"
     t.string "image_url"
     t.string "nickname"
     t.string "about"
@@ -366,7 +416,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
     t.integer "capacity"
     t.boolean "require_approval", default: false
     t.string "tags", array: true
-    t.boolean "removed"
     t.string "visibility", comment: "all | manager | none"
   end
 

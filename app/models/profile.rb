@@ -12,7 +12,7 @@ class Profile < ApplicationRecord
   has_many :point_classes, class_name: "PointClass", inverse_of: "creator", foreign_key: "creator_id"
   has_many :owned_point_balances, class_name: "PointBalance", inverse_of: "owner", foreign_key: "owner_id"
   has_many :created_point_balances, class_name: "PointBalance", inverse_of: "creator", foreign_key: "creator_id"
-  has_many :received_point_transfers, class_name: "PointTransfer", inverse_of: "owner", foreign_key: "owner_id"
+  has_many :received_point_transfers, class_name: "PointTransfer", inverse_of: "receiver", foreign_key: "receiver_id"
   has_many :sent_point_items, class_name: "PointTransfer", inverse_of: "sender", foreign_key: "sender_id"
 
   has_many :vouchers, class_name: "Voucher", inverse_of: "sender", foreign_key: "sender_id"
