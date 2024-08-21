@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_20_210728) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_144021) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -41,6 +41,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_20_210728) do
     t.date "end_date"
     t.string "kind", comment: "popup_city | community"
     t.string "group_tags", array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "contacts", force: :cascade do |t|
+    t.integer "source_id"
+    t.integer "target_id"
+    t.string "label"
+    t.string "role", default: "contact", null: false, comment: "contact | follow"
+    t.string "status", default: "normal", null: false, comment: "normal | freezed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
