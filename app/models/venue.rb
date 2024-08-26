@@ -10,5 +10,5 @@ class Venue < ApplicationRecord
   accepts_nested_attributes_for :venue_timeslots, allow_destroy: true
   accepts_nested_attributes_for :venue_overrides, allow_destroy: true
 
-  enum visibility: { all: 'all', manager: 'manager', none: 'none' }
+  validates :visibility, inclusion: { in: %w(all manager none) }
 end

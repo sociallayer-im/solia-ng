@@ -1,5 +1,6 @@
 require "jwt"
 $hmac_secret = ENV["JWT_SECRET_KEY"]
+raise "missing JWT_SECRET_KEY" unless $hmac_secret
 
 class Profile < ApplicationRecord
   belongs_to :group, optional: true
@@ -29,7 +30,7 @@ class Profile < ApplicationRecord
   has_many :contact_sources, :through => :target_contacts, :source => "source", foreign_key: "target_id"
   has_many :contact_targets, :through => :source_contacts, :source => "target", foreign_key: "source_id"
 
-  enum status: { active: 'active', freezed: 'freezed' }
+  enum :status, { active: 'active', freezed: 'freezed' }
 
   def gen_auth_token
     payload = {

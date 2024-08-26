@@ -10,6 +10,6 @@ class BadgeClass < ApplicationRecord
 
   validates :name, presence: true
   validates :title, presence: true
-  enum status: { active: 'active', freezed: 'freezed' }
-  enum display: { normal: 'normal', hidden: 'hidden', pinned: 'pinned' }
+  enum :status, { active: 'active', freezed: 'freezed' }
+  enum :display, { normal: 'normal', hidden: 'hidden', pinned: 'pinned' }
 end

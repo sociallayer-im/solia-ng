@@ -1,5 +1,5 @@
 class Track < ApplicationRecord
   belongs_to :group
 
-  enum kind: { public: 'public', private: 'private' }
+  validates :kind, inclusion: { in: %w(public private) }
 end

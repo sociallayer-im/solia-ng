@@ -10,6 +10,7 @@ class EventPolicy < ApplicationPolicy
     @event.owner_id == @profile.id || @event.group.is_manager(@profile.id) ||
     EventRole.find_by(event_id: @event.id, profile_id: @profile.id) ||
     EventRole.find_by(event_id: @event.id, email: @profile.email)
+    # todo : limiting role as host, co-host, speaker
   end
 
   def join?

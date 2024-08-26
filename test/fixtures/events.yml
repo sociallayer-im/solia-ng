@@ -1,11 +1,12 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+one:
+  group_id: 1
+  owner_id: 1
+  title: "my meetup"
+  tags: ["live", "art"]
+  start_time: "2024-08-08T10:20:30+00:00"
+  end_time: "2024-08-08T10:22:30+00:00"
+  location: "central park"
+  content: "wonderful"
+  status: "published"
+  display: "normal"
+  event_type: "event"

@@ -1,5 +1,4 @@
-class Api::BadgeController < ApplicationController
-
+class Api::BadgeController < ApiController
   def meta
     @badge = Badge.find(params[:id])
 
@@ -76,7 +75,7 @@ class Api::BadgeController < ApplicationController
 
     payload = {
       badge_id: badge.id,
-      auth_type: "swap",
+      auth_type: "swap"
     }
     token = JWT.encode payload, $hmac_secret, "HS256"
     activity = Activity.create(item: badge, initiator_id: profile.id, action: "badge/swap_code")
@@ -146,12 +145,11 @@ class Api::BadgeController < ApplicationController
 
     badges.each do |badge|
       badge.status = "burned"
-      badge.metadata = JSON.dump({merged: badge_class.id})
+      badge.metadata = JSON.dump({ merged: badge_class.id })
       badge.save
       activity = Activity.create(item: badge, initiator_id: profile.id, action: "badge/burn")
     end
 
     render json: { result: "ok", badge_id: badge.id }
   end
-
 end

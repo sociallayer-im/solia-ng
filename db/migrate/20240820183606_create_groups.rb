@@ -19,7 +19,7 @@ class CreateGroups < ActiveRecord::Migration[7.2]
       t.string :banner_link_url
       t.string :banner_image_url
       t.integer :memberships_count
-      t.integer :events_count
+      t.integer :events_count, default: 0
       t.string :timezone
       t.string :location
       t.jsonb :metadata

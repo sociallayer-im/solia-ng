@@ -6,7 +6,7 @@ class Badge < ApplicationRecord
   has_many :comments
   has_many :activities, as: :item
 
-  enum status: { minted: 'minted', burned: 'burned' }
-  enum display: { normal: 'normal', hidden: 'hidden', pinned: 'pinned' }
+  enum :status, { minted: 'minted', burned: 'burned' }
+  enum :display, { normal: 'normal', hidden: 'hidden', pinned: 'pinned' }
   validates :end_time, comparison: { greater_than: :start_time }, allow_nil: true
 end

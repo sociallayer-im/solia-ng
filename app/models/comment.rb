@@ -8,5 +8,5 @@ class Comment < ApplicationRecord
   belongs_to :edit_parent, class_name: "Comment", foreign_key: "edit_parent_id"
 
   validates :comment_type, inclusion: { in: %w(checkin chat event) }
-  enum status: { normal: 'normal', edited: 'edited', removed: 'removed' }
+  enum :status, { normal: 'normal', edited: 'edited', removed: 'removed' }
 end

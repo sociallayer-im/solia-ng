@@ -1,5 +1,4 @@
-class Api::PointClassController < ApplicationController
-
+class Api::PointClassController < ApiController
   def create
     profile = current_profile!
     name = params[:name]
@@ -25,5 +24,4 @@ class Api::PointClassController < ApplicationController
     )
     render json: { result: "ok", point_class: point_class.as_json }
   end
-
 end

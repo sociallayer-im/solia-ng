@@ -1,5 +1,4 @@
-class Api::PointController < ApplicationController
-
+class Api::PointController < ApiController
   def create
     profile = current_profile!
 
@@ -21,7 +20,7 @@ class Api::PointController < ApplicationController
         sender_id: profile.id,
         receiver_id: receiver.id
       )
-      activity = Activity.create(item: point_item, initiator_id: profile.id, action: "point/send", receiver_type: 'id', receiver_id: receiver.id, data: point_item.value.to_s)
+      activity = Activity.create(item: point_item, initiator_id: profile.id, action: "point/send", receiver_type: "id", receiver_id: receiver.id, data: point_item.value.to_s)
 
       point_item
     end
@@ -64,7 +63,7 @@ class Api::PointController < ApplicationController
       source_point.decrement!(:value, params[:amount].to_i)
       point = PointBalance.create(point_class_id: source_point.point_class_id, creator_id: source_point.creator_id, owner_id: params[:target_profile_id], value: params[:amount])
     end
-    point_item = PointItem.create(point_class_id: point.point_class_id, sender_id: source_point.owner_id, owner_id: params[:target_profile_id], value: params[:amount].to_i, status: 'transfered' )
+    point_item = PointItem.create(point_class_id: point.point_class_id, sender_id: source_point.owner_id, owner_id: params[:target_profile_id], value: params[:amount].to_i, status: "transfered")
     render json: { result: "ok", point_item: point_item.as_json }
   end
 
@@ -79,5 +78,4 @@ class Api::PointController < ApplicationController
     activity = Activity.create(item: point_item, initiator_id: profile.id, action: "point/reject")
     render json: { result: "ok", point_item: point_item.as_json }
   end
-
 end

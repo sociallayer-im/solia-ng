@@ -8,6 +8,7 @@ class AuthTokenError < StandardError
 end
 
 class ApiController < ApplicationController
+  skip_forgery_protection
   include Pundit::Authorization
 
   def check_address(addr)

@@ -7,5 +7,5 @@ class GroupInvite < ApplicationRecord
   has_many   :activities, as: :item
 
   validates :role, inclusion: { in: %w(member operator manager owner) }
-  enum status: { sending: 'sending', requesting: 'requesting', accepted: 'accepted', cancelled: 'cancelled', revoked: 'revoked' }
+  enum :status, { sending: 'sending', requesting: 'requesting', accepted: 'accepted', cancelled: 'cancelled', revoked: 'revoked' }
 end

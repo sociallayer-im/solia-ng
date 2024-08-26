@@ -1,5 +1,4 @@
-class Api::GroupController < ApplicationController
-
+class Api::GroupController < ApiController
   def create
     profile = current_profile!
 
@@ -14,13 +13,7 @@ class Api::GroupController < ApplicationController
       return
     end
 
-    params.permit(
-      :chain, :image_url, :nickname, :about, :parent_id, :status,
-      :tags, :event_taglist, :venue_taglist, :can_publish_event, :can_join_event, :can_view_event,
-      :customizer, :logo_url, :banner_link_url, :banner_image_url,
-      :timezone, :location, :metadata, :social_links,
-        )
-    group = Group.new(params)
+    group = Group.new(group_params)
     group.update(
       handle: handle
     )
@@ -35,14 +28,7 @@ class Api::GroupController < ApplicationController
     group = Group.find(params[:id])
     authorize group, :manage?, policy_class: GroupPolicy
 
-    params.permit(
-          :chain, :image_url, :nickname, :about, :parent_id, :status,
-          :tags, :event_taglist, :venue_taglist, :can_publish_event, :can_join_event, :can_view_event,
-          :customizer, :logo_url, :banner_link_url, :banner_image_url,
-          :timezone, :location, :metadata, :social_links,
-          :tracks => [:id, :tag, :title, :kind, :icon_url, :about, :group_id, :start_date, :end_date, :_destroy]
-            )
-    group.update(params)
+    group.update(group_params)
     render json: { result: "ok", group: group }
   end
 
@@ -58,11 +44,11 @@ class Api::GroupController < ApplicationController
     raise AppError.new("new_owner not exists") unless new_owner
 
     membership = Membership.find_by(profile_id: new_owner.id, target_id: group.id)
-    return render json: {result: "error", message: "new_owner membership not exists"} if membership.nil?
-    return render json: {result: "error", message: "new_owner is owner of the group"} if membership.role == "owner"
+    return render json: { result: "error", message: "new_owner membership not exists" } if membership.nil?
+    return render json: { result: "error", message: "new_owner is owner of the group" } if membership.role == "owner"
 
-    old_membership.update(role: 'member')
-    membership.update(role: 'owner')
+    old_membership.update(role: "member")
+    membership.update(role: "owner")
 
     render json: { result: "ok", group: group }
   end
@@ -116,7 +102,7 @@ class Api::GroupController < ApplicationController
     authorize group, :own?, policy_class: GroupPolicy
 
     membership = Membership.find_by(profile_id: profile.id, target_id: group.id, role: %w[manager])
-    membership.update(role: 'member')
+    membership.update(role: "member")
     render json: { result: "ok" }
   end
 
@@ -126,7 +112,7 @@ class Api::GroupController < ApplicationController
     authorize group, :manage?, policy_class: GroupPolicy
 
     membership = Membership.find_by(profile_id: profile.id, target_id: group.id, role: %w[operator])
-    membership.update(role: 'member')
+    membership.update(role: "member")
     render json: { result: "ok" }
   end
 
@@ -137,7 +123,7 @@ class Api::GroupController < ApplicationController
     authorize group, :manage?, policy_class: GroupPolicy
 
     membership = Membership.find_by(profile_id: profile.id, target_id: group.id, role: %w[member operator])
-    membership.update(role: 'manager')
+    membership.update(role: "manager")
 
     render json: { result: "ok" }
   end
@@ -148,7 +134,7 @@ class Api::GroupController < ApplicationController
     authorize group, :manage?, policy_class: GroupPolicy
 
     membership = Membership.find_by(profile_id: profile.id, target_id: group.id, role: %w[member])
-    membership.update(role: 'operator')
+    membership.update(role: "operator")
     render json: { result: "ok" }
   end
 
@@ -162,4 +148,14 @@ class Api::GroupController < ApplicationController
     render json: { result: "ok" }
   end
 
+  private
+
+  def group_params
+    params.require(:group).permit(
+          :chain, :image_url, :nickname, :about, :parent_id, :status,
+          :tags, :event_taglist, :venue_taglist, :can_publish_event, :can_join_event, :can_view_event,
+          :customizer, :logo_url, :banner_link_url, :banner_image_url,
+          :timezone, :location, :metadata, :social_links,
+            )
+  end
 end

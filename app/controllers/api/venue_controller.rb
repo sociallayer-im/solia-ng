@@ -1,15 +1,9 @@
-class Api::VenueController < ApplicationController
-
+class Api::VenueController < ApiController
   def create
     profile = current_profile!
     group = Group.find(params[:group_id])
 
-    params.permit(
-      :title, :location, :about, :link, :capacity, :formatted_address, :location_viewport, :geo_lat, :geo_lng, :start_date, :end_date, :timeslots, :overrides, :require_approval, :visibility, :tags,
-      :venue_overrides => [:id, :group_id, :venue_id, :day, :disabled, :start_at, :end_at, :_destroy],
-      :venue_timeslots => [:id, :group_id, :venue_id, :day_of_week, :disabled, :start_at, :end_at, :_destroy])
-
-    venue = Venue.new(params)
+    venue = Venue.new(venue_params)
     venue.update(
       owner: profile,
       group: group,
@@ -22,11 +16,7 @@ class Api::VenueController < ApplicationController
     venue = Venue.find(params[:id])
     authorize venue.group, :manage_venue?
 
-    params.permit(
-          :title, :location, :about, :link, :capacity, :formatted_address, :location_viewport, :geo_lat, :geo_lng, :start_date, :end_date, :timeslots, :overrides, :require_approval, :visibility, :tags,
-          :venue_overrides => [:id, :group_id, :venue_id, :day, :disabled, :start_at, :end_at, :_destroy],
-          :venue_timeslots => [:id, :group_id, :venue_id, :day_of_week, :disabled, :start_at, :end_at, :_destroy])
-    venue.update(params)
+    venue.update(venue_params)
 
     render json: { venue: venue.as_json }
   end
@@ -36,9 +26,17 @@ class Api::VenueController < ApplicationController
     venue = Venue.find(params[:id])
     authorize venue.group, :manage_venue?
 
-    venue.update(visibility: 'none')
+    venue.update(visibility: "none")
 
     render json: { venue: venue.as_json }
   end
 
+  private
+
+  def venue_params
+    params.permit(
+      :title, :location, :about, :link, :capacity, :formatted_address, :location_viewport, :geo_lat, :geo_lng, :start_date, :end_date, :timeslots, :overrides, :require_approval, :visibility, :tags,
+      venue_overrides: [ :id, :group_id, :venue_id, :day, :disabled, :start_at, :end_at, :_destroy ],
+      venue_timeslots: [ :id, :group_id, :venue_id, :day_of_week, :disabled, :start_at, :end_at, :_destroy ])
+  end
 end

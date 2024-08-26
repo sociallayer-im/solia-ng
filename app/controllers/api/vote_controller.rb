@@ -1,19 +1,11 @@
-class Api::VoteController < ApplicationController
-
+class Api::VoteController < ApiController
   def create
     profile = current_profile!
     group = Group.find(params[:group_id])
 
     authorize group, :create_vote?, policy_class: GroupPolicy
 
-    params.permit(:title, :content, :show_voters, :max_choice,
-      :eligibile_group_id, :eligibile_badge_class_id, :eligibile_point_id,
-      :verification, :eligibility, :can_update_vote, :start_time, :end_time,
-      vote_options_attributes: [:id, :title, :link, :_destroy]
-    )
-
-    data = params.permit(:vote_options => [:title, :link])
-    proposal = VoteProposal.new(params)
+    proposal = VoteProposal.new(vote_proposal_params)
     proposal.update(
       creator: profile,
       group: group,
@@ -27,7 +19,7 @@ class Api::VoteController < ApplicationController
 
     proposal = VoteProposal.find(params[:id])
     authorize proposal, :cancel?
-    proposal.update(status: 'cancel')
+    proposal.update(status: "cancel")
 
     render json: { result: "ok" }
   end
@@ -38,12 +30,7 @@ class Api::VoteController < ApplicationController
     proposal = VoteProposal.find(params[:id])
     authorize proposal, :update?
 
-    params.permit(:title, :content, :show_voters, :max_choice,
-          :eligibile_group_id, :eligibile_badge_class_id, :eligibile_point_id,
-          :verification, :eligibility, :can_update_vote, :start_time, :end_time,
-          vote_options_attributes: [:id, :title, :link, :_destroy]
-        )
-    proposal.update(params)
+    proposal.update(vote_proposal_params)
 
     render json: { proposal: proposal.as_json }
   end
@@ -65,7 +52,7 @@ class Api::VoteController < ApplicationController
     raise AppError.new("exceed vote_proposal max_choice") if options.count > (proposal.max_choice || 1)
 
     raise AppError.new("user has voted") if VoteRecord.find_by(vote_proposal_id: proposal.id, voter_id: profile.id)
-    raise AppError.new("vote has been cancelled") if proposal.status == 'cancel'
+    raise AppError.new("vote has been cancelled") if proposal.status == "cancel"
 
     if proposal.start_time
       raise AppError.new("voting time not started") if DateTime.now < proposal.start_time
@@ -106,4 +93,13 @@ class Api::VoteController < ApplicationController
     render json: { result: "ok", voter_records: record.as_json }
   end
 
+  private
+
+  def vote_proposal_params
+    params,require(:vote_proposal).permit(:title, :content, :show_voters, :max_choice,
+          :eligibile_group_id, :eligibile_badge_class_id, :eligibile_point_id,
+          :verification, :eligibility, :can_update_vote, :start_time, :end_time,
+          vote_options_attributes: [ :id, :title, :link, :_destroy ]
+        )
+  end
 end

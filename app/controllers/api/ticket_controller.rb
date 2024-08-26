@@ -1,7 +1,6 @@
-class Api::TicketController < ApplicationController
-
+class Api::TicketController < ApiController
   def set_payment_status
-      unless params[:next_token] == ENV['NEXT_TOKEN']
+      unless params[:next_token] == ENV["NEXT_TOKEN"]
         raise AppError.new("invalid next token")
       end
 
@@ -9,7 +8,7 @@ class Api::TicketController < ApplicationController
       event = Event.find(params[:id])
       participant = Participant.find_by(event_id: event.id, profile_id: profile.id)
       unless participant
-        return render json: { result: 'error', message: 'participant not found' }
+        return render json: { result: "error", message: "participant not found" }
       end
 
       participant = Participant.find_by(event_id: event.id, profile_id: profile.id)
@@ -24,7 +23,7 @@ class Api::TicketController < ApplicationController
     end
 
     def set_ticket_payment_status
-      unless params[:next_token] == ENV['NEXT_TOKEN']
+      unless params[:next_token] == ENV["NEXT_TOKEN"]
         raise AppError.new("invalid next token")
       end
 
@@ -37,15 +36,15 @@ class Api::TicketController < ApplicationController
 
       ticket_item = TicketItem.find_by(chain: params[:chain], event_id: params[:product_id], order_number: params[:item_id].to_s)
       if ticket_item.status == "succeeded"
-        return render json: { result: 'ok', message: 'skip verify succeeded ticket_item' }
+        return render json: { result: "ok", message: "skip verify succeeded ticket_item" }
       end
 
       unless ticket_item
-        return render json: { result: 'error', message: 'ticket_item not found' }
+        return render json: { result: "error", message: "ticket_item not found" }
       end
 
       if params[:amount].to_i < ticket_item.amount
-        return render json: { result: 'error', message: 'amount invalid' }
+        return render json: { result: "error", message: "amount invalid" }
       end
 
       # todo : verify token_address, receiver_address, chain
@@ -85,7 +84,7 @@ class Api::TicketController < ApplicationController
         participant = Participant.create(
           profile: profile,
           event: event,
-          role: 'attendee',
+          role: "attendee",
           status: status,
           message: params[:message],
           ticket_id: ticket.id, # todo : remove ticket relation or use first success ticket relation
@@ -93,9 +92,9 @@ class Api::TicketController < ApplicationController
       end
 
       if ticket.payment_methods.any?
-        paymethod = PaymentMethod.find_by(id: params[:payment_method_id], item_type: 'Ticket', item_id: ticket.id)
+        paymethod = PaymentMethod.find_by(id: params[:payment_method_id], item_type: "Ticket", item_id: ticket.id)
         unless paymethod
-          return render json: { result: 'error', message: 'payment_method not found' }
+          return render json: { result: "error", message: "payment_method not found" }
         end
         amount = paymethod.price
         discount_value = nil
@@ -158,4 +157,14 @@ class Api::TicketController < ApplicationController
       render json: { participant: participant.as_json, ticket_item: ticket_item.as_json }
     end
 
+    def check_promo_code
+      promo_code = PromoCode.find_by(event_id: params[:event_id], code: params[:code])
+      render json: { promo_code: promo_code.as_json }
+    end
+
+    def get_promo_code
+      promo_code = PromoCode.find(params[:id])
+      authorize promo_code.event, :update?
+      render json: { promo_code_id: promo_code.id, code: promo_code.code }
+    end
 end

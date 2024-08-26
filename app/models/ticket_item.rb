@@ -6,6 +6,6 @@ class TicketItem < ApplicationRecord
   belongs_to :payment_method
   belongs_to :group, optional: true
 
-  enum ticket_type: { event: 'event', group: 'group' }
-  enum auth_type: { free: 'free', payment: 'payment', zupass: 'zupass', badge: 'badge', invite: 'invite' }
+  validates :ticket_type, inclusion: { in: %w(event group) }
+  enum :auth_type, { free: 'free', payment: 'payment', zupass: 'zupass', badge: 'badge', invite: 'invite' }
 end

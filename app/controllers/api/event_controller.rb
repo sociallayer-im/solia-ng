@@ -1,17 +1,16 @@
-class Api::EventController < ApplicationController
-
+class Api::EventController < ApiController
   def create
     profile = current_profile!
     group = Group.find(params[:group_id])
 
-    status = 'published'
+    status = "published"
     @send_approval_email_to_manager = false
     if params[:venue_id]
       venue = Venue.find_by(id: params[:venue_id], group_id: group.id)
       raise AppError.new("group venue not exists") unless venue
 
       if venue.require_approval && !group.is_manager(profile.id)
-        status = 'pending'
+        status = "pending"
         @send_approval_email_to_manager = true
       end
     end
@@ -21,40 +20,7 @@ class Api::EventController < ApplicationController
       authorize badge_class, :send?
     end
 
-    data = params.permit(
-      :title,
-      :start_time,
-      :end_time,
-      :timezone,
-      :meeting_url,
-      :external_url,
-      :venue_id,
-      :location,
-      :formatted_address,
-      :location_viewport,
-      :geo_lat,
-      :geo_lng,
-      :cover_url,
-      :require_approval,
-      :host_info,
-      :extra,
-      :content,
-      :notes,
-      :display,
-      :category,
-      :tags,
-      :operators,
-      :max_participant,
-      :min_participant,
-      :tickets => [:title, :content, :check_badge_class_id, :quantity, :end_time, :need_approval, :status,
-                    :payment_chain, :payment_token_name, :payment_token_address,
-                    :payment_target_address, :payment_token_price, :payment_metadata, :_destroy,
-                    payment_methods_attributes: [:id, :chain, :kind, :token_name, :token_address, :receiver_address, :price, :_destroy]],
-      :promo_codes => [:id, :selector_type, :label, :code, :receiver_address, :discount_type, :discount, :applicable_ticket_ids, :ticket_item_ids, :expiry_time, :max_allowed_usages, :order_usage_count, :_destroy],
-      :event_roles => [:id, :role, :group_id, :event_id, :profile_id, :email, :nickname, :image_url, :_destroy],
-      )
-
-    event = Event.new(params)
+    event = Event.new(event_params)
     event.update(
       owner: profile,
       group: group,
@@ -63,7 +29,7 @@ class Api::EventController < ApplicationController
     group.increment!(:events_count)
 
     if @send_approval_email_to_manager && ENV["DO_NOT_SEND_EMAIL"].blank?
-      Membership.includes(:profile).where(target_id: group.id, role: ['owner', 'manager']).each do |membership|
+      Membership.includes(:profile).where(target_id: group.id, role: [ "owner", "manager" ]).each do |membership|
         if membership.cap.present? && membership.cap.include?("venue") && membership.profile.email.present?
           mailer = GroupMailer.with(group_name: (group.nickname || group.username), event_id: event.id, recipient: membership.profile.email).venue_review_email
           mailer.deliver_now!
@@ -101,9 +67,9 @@ class Api::EventController < ApplicationController
         badge_class: badge_class,
         # need test
         message: params[:message],
-        strategy: 'event',
+        strategy: "event",
         counter: 1,
-        receiver_address_type: 'id',
+        receiver_address_type: "id",
         receiver_id: receiver.id,
         # need test
         expires_at: (params[:expires_at] || DateTime.now + 90.days),
@@ -124,55 +90,21 @@ class Api::EventController < ApplicationController
     event = Event.find(params[:id])
     authorize event, :update?
 
-    if params[:venue_id] && params[:venue_id] != event.venue_id
+    if params[:event][:venue_id] && params[:event][:venue_id] != event.venue_id
       venue = Venue.find_by(id: params[:venue_id], group_id: group.id)
       raise AppError.new("group venue not exists") unless venue
 
       if venue.require_approval && !group.is_manager(profile.id)
-        status = 'pending'
+        status = "pending"
         @send_approval_email_to_manager = true
       end
     end
-
-
-    data = params.permit(
-          :title,
-          :start_time,
-          :end_time,
-          :timezone,
-          :meeting_url,
-          :external_url,
-          :venue_id,
-          :location,
-          :formatted_address,
-          :location_viewport,
-          :geo_lat,
-          :geo_lng,
-          :cover_url,
-          :require_approval,
-          :host_info,
-          :extra,
-          :content,
-          :notes,
-          :display,
-          :category,
-          :tags,
-          :operators,
-          :max_participant,
-          :min_participant,
-          :tickets => [:title, :content, :check_badge_class_id, :quantity, :end_time, :need_approval, :status,
-                        :payment_chain, :payment_token_name, :payment_token_address,
-                        :payment_target_address, :payment_token_price, :payment_metadata, :_destroy,
-                        payment_methods_attributes: [:id, :chain, :kind, :token_name, :token_address, :receiver_address, :price, :_destroy]],
-          :promo_codes => [:id, :selector_type, :label, :code, :receiver_address, :discount_type, :discount, :applicable_ticket_ids, :ticket_item_ids, :expiry_time, :max_allowed_usages, :order_usage_count, :_destroy],
-          :event_roles => [:id, :role, :group_id, :event_id, :profile_id, :email, :nickname, :image_url, :_destroy],
-          )
 
     old_start_time = event.start_time
     old_end_time = event.end_time
     old_location = event.location
 
-    event.update(params)
+    event.update(event_params)
 
     if old_start_time != event.start_time || old_end_time != event.end_time || old_location != event.location
       event.participants.each do |participant|
@@ -186,20 +118,17 @@ class Api::EventController < ApplicationController
     render json: { result: "ok", event: event.as_json }
   end
 
-  def cancel_event
+  def unpublish
     profile = current_profile!
 
     event = Event.find(params[:id])
     authorize event, :update?
 
-    event.update(status: "cancel")
+    event.update(status: "cancelled")
     event.group.decrement!(:events_count)
 
     event.participants.each do |participant|
-      if participant.profile.email.present?
-        recipient = participant.profile.email
-        event.send_mail_cancel_event(recipient)
-      end
+      participant.email_notify!(:cancel)
     end
 
     render json: { result: "ok", event: event.as_json }
@@ -245,7 +174,7 @@ class Api::EventController < ApplicationController
       return render json: { result: "ok", check: true, message: "action allowed" } if ok
     end
 
-    return render json: { result: "ok", check: false, message: "action not allowed" } if ok
+    render json: { result: "ok", check: false, message: "action not allowed" } if ok
   end
 
   def join
@@ -267,9 +196,7 @@ class Api::EventController < ApplicationController
       participant = Participant.new(
         profile: profile,
         event: event,
-        role: 'attendee',
         status: status,
-        message: params[:message],
       )
     end
 
@@ -277,10 +204,10 @@ class Api::EventController < ApplicationController
 
     event.increment!(:participants_count)
 
-    if profile.email.present?
-      recipient = profile.email
-      event.send_mail_new_event(recipient)
-    end
+    # if profile.email.present?
+    #   recipient = profile.email
+    #   event.send_mail_new_event(recipient)
+    # end
 
     render json: { participant: participant.as_json }
   end
@@ -303,12 +230,10 @@ class Api::EventController < ApplicationController
     event = Event.find(params[:id])
 
     participant = Participant.find_by(event_id: params[:id], profile_id: profile.id)
-    authorize participant, :cancel?
+    authorize participant, :update?
 
-    # participant.status = "cancel"
-    # participant.save
-    participant.destroy
-
+    # todo : refund or require more action when cancelling paid participants
+    participant.update(status: "cancelled")
     event.decrement!(:participants_count)
 
     if profile.email.present?
@@ -318,29 +243,20 @@ class Api::EventController < ApplicationController
     render json: { participant: participant.as_json }
   end
 
-  def invite_guest
-    profile = current_profile!
-    event = Event.find(params[:id])
-    authorize event, :update?
+  private
 
-    participants = []
-    params[:targets].map do |target|
-      target = Profile.find_by(username: target)
-
-      participant = Participant.find_or_create_by(
-        event_id: params[:id],
-        profile_id: target.id,
-          role: "speaker",
-          status: "attending",
-        )
-
-      event.increment!(:participants_count)
-      participants << participant
-    end
-
-    # todo : send notifications
-
-    render json: { participant: participants.as_json }
+  def event_params
+    params.require(:event).permit(
+      :title, :start_time, :end_time, :timezone, :meeting_url, :external_url,
+      :venue_id, :location, :formatted_address, :location_viewport, :geo_lat, :geo_lng, :event_type,
+      :cover_url, :require_approval, :extra, :content, :notes, :display, :tags, :operators, :max_participant, :min_participant,
+      tickets: [
+        :title, :content, :check_badge_class_id, :quantity, :end_time, :need_approval, :status,
+        :payment_chain, :payment_token_name, :payment_token_address,
+        :payment_target_address, :payment_token_price, :payment_metadata, :_destroy,
+        payment_methods_attributes: [ :id, :chain, :kind, :token_name, :token_address, :receiver_address, :price, :_destroy ] ],
+      promo_codes: [ :id, :selector_type, :label, :code, :receiver_address, :discount_type, :discount, :applicable_ticket_ids, :ticket_item_ids, :expiry_time, :max_allowed_usages, :order_usage_count, :_destroy ],
+      event_roles: [ :id, :role, :group_id, :event_id, :profile_id, :email, :nickname, :image_url, :_destroy ],
+      )
   end
-
 end

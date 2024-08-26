@@ -11,7 +11,7 @@ class Event < ApplicationRecord
   has_many :promo_codes, dependent: :delete_all
 
   validates :end_time, comparison: { greater_than: :start_time }
-  validates :status, inclusion: { in: %w(draft pending published closed cancel) }
+  validates :status, inclusion: { in: %w(draft pending published closed cancelled) }
   validates :display, inclusion: { in: %w(normal hidden pinned) }
   validates :event_type, inclusion: { in: %w(event) }
 
