@@ -1,6 +1,6 @@
 one:
   id: 1
-  handle: guild
+  handle: "guildx"
   events_count: 0
   can_publish_event: "all"
   can_join_event: "all"

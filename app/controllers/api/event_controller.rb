@@ -1,11 +1,11 @@
 class Api::EventController < ApiController
   def create
     profile = current_profile!
-    group = Group.find(params[:group_id])
+    group = Group.find_by(id: params[:group_id])
 
     status = "published"
     @send_approval_email_to_manager = false
-    if params[:venue_id]
+    if group && params[:venue_id]
       venue = Venue.find_by(id: params[:venue_id], group_id: group.id)
       raise AppError.new("group venue not exists") unless venue
 
@@ -13,6 +13,8 @@ class Api::EventController < ApiController
         status = "pending"
         @send_approval_email_to_manager = true
       end
+    elsif params[:venue_id]
+      raise AppError.new("group is empty")
     end
 
     if params[:badge_class_id]
@@ -22,16 +24,18 @@ class Api::EventController < ApiController
 
     event = Event.new(event_params)
     event.update(
+      status: status,
       owner: profile,
       group: group,
     )
 
-    group.increment!(:events_count)
+    group.increment!(:events_count) if group
 
     if @send_approval_email_to_manager && ENV["DO_NOT_SEND_EMAIL"].blank?
-      Membership.includes(:profile).where(target_id: group.id, role: [ "owner", "manager" ]).each do |membership|
-        if membership.cap.present? && membership.cap.include?("venue") && membership.profile.email.present?
-          mailer = GroupMailer.with(group_name: (group.nickname || group.username), event_id: event.id, recipient: membership.profile.email).venue_review_email
+      Membership.includes(:profile).where(profile_id: group.id, role: [ "owner", "manager" ]).each do |membership|
+        if membership.data.present? && membership.data.include?("venue") && membership.profile.email.present?
+          group_name = group ? (group.nickname || group.username) : ""
+          mailer = GroupMailer.with(group_name: group_name, event_id: event.id, recipient: membership.profile.email).venue_review_email
           mailer.deliver_now!
         end
       end
@@ -237,9 +241,11 @@ class Api::EventController < ApiController
     params.require(:event).permit(
       :title, :start_time, :end_time, :timezone, :meeting_url, :external_url,
       :venue_id, :location, :formatted_address, :location_viewport, :geo_lat, :geo_lng, :event_type,
-      :cover_url, :require_approval, :extra, :content, :notes, :display, :tags, :operators, :max_participant, :min_participant,
+      :cover_url, :require_approval, :extra, :content, :notes, :display, :operators, :max_participant, :min_participant,
+      :tags => [],
+      :extra => {},
       tickets: [
-        :title, :content, :check_badge_class_id, :quantity, :end_time, :need_approval, :status,
+        :title, :content, :check_badge_class_id, :quantity, :end_time, :need_approval,
         :payment_chain, :payment_token_name, :payment_token_address,
         :payment_target_address, :payment_token_price, :payment_metadata, :_destroy,
         payment_methods_attributes: [ :id, :chain, :kind, :token_name, :token_address, :receiver_address, :price, :_destroy ] ],

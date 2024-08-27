@@ -96,22 +96,22 @@ class Api::GroupController < ApiController
     render json: { result: "ok" }
   end
 
-  def remove_manager
-    profile = Profile.find(params[:profile_id])
-    group = Group.find(params[:group_id])
-    authorize group, :own?, policy_class: GroupPolicy
-
-    membership = Membership.find_by(profile_id: profile.id, group_id: group.id, role: %w[manager])
-    membership.update(role: "member")
-    render json: { result: "ok" }
-  end
-
   def remove_operator
     profile = Profile.find(params[:profile_id])
     group = Group.find(params[:group_id])
     authorize group, :manage?, policy_class: GroupPolicy
 
     membership = Membership.find_by(profile_id: profile.id, group_id: group.id, role: %w[operator])
+    membership.update(role: "member")
+    render json: { result: "ok" }
+  end
+
+  def remove_manager
+    profile = Profile.find(params[:profile_id])
+    group = Group.find(params[:group_id])
+    authorize group, :own?, policy_class: GroupPolicy
+
+    membership = Membership.find_by(profile_id: profile.id, group_id: group.id, role: %w[manager])
     membership.update(role: "member")
     render json: { result: "ok" }
   end
@@ -143,7 +143,7 @@ class Api::GroupController < ApiController
     group = Group.find(params[:group_id])
     raise AppError.new("no membership") unless (current_profile!).id == profile.id
 
-    membership = Membership.find_by(profile_id: profile.id, group_id: group.id, role: %w[member manager owner])
+    membership = Membership.find_by(profile_id: profile.id, group_id: group.id, role: %w[member manager])
     membership.destroy
     render json: { result: "ok" }
   end
