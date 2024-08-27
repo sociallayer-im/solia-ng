@@ -40,18 +40,6 @@ class Api::EventController < ApiController
     render json: { result: "ok", event: event.as_json }
   end
 
-  def set_status
-    profile = current_profile!
-    event = Event.find(params[:id])
-    authorize event.group, :manage?, policy_class: GroupPolicy
-
-    event.update(
-      status: params[:status]
-    )
-
-    render json: { result: "ok", event: event.as_json }
-  end
-
   def send_badge
     profile = current_profile!
     event = Event.find(params[:id])

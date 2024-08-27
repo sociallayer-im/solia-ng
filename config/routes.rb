@@ -20,6 +20,11 @@ Rails.application.routes.draw do
     post "profile/signin_with_email", to: "profile#signin_with_email"
     post "profile/set_verified_email", to: "profile#set_verified_email"
 
+    post "group/create", to: "group#create"
+    post "group/update", to: "group#update"
+    post "group/freeze", to: "group#freeze_group"
+    post "group/transfer_owner", to: "group#transfer_owner"
+
     post "event/create", to: "event#create"
     post "event/update", to: "event#update"
     post "event/unpublish", to: "event#unpublish"
