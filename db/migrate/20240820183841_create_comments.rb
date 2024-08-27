@@ -6,7 +6,7 @@ class CreateComments < ActiveRecord::Migration[7.2]
       t.string "comment_type"
       t.integer "profile_id"
       t.integer "badge_id"
-      t.string "status"
+      t.string "status", default: "normal"
       t.string "title"
       t.text  "content"
       t.string "icon_url"

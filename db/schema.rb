@@ -88,7 +88,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.string "comment_type"
     t.integer "profile_id"
     t.integer "badge_id"
-    t.string "status"
+    t.string "status", default: "normal"
     t.string "title"
     t.text "content"
     t.string "icon_url"
@@ -203,7 +203,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.string "banner_link_url"
     t.string "banner_image_url"
     t.integer "memberships_count"
-    t.integer "events_count"
+    t.integer "events_count", default: 0
     t.string "timezone"
     t.string "location"
     t.jsonb "metadata"
@@ -503,7 +503,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.integer "eligibile_badge_class_id"
     t.integer "eligibile_point_id"
     t.string "verification"
-    t.string "status", default: "open", null: false, comment: "draft | open | closed | cancel"
+    t.string "status", default: "published", null: false, comment: "draft | published | closed | cancelled"
     t.boolean "show_voters"
     t.boolean "can_update_vote"
     t.integer "voter_count", default: 0
@@ -536,7 +536,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.integer "counter", default: 1
     t.integer "receiver_id"
     t.string "receiver_address"
-    t.string "receiver_address_type"
+    t.string "receiver_address_type", default: "id"
     t.datetime "claimed_at"
     t.boolean "claimed_by_server", default: false
     t.string "strategy", default: "code"

@@ -13,7 +13,7 @@ class CreateVouchers < ActiveRecord::Migration[7.2]
       t.integer "counter", default: 1
       t.integer "receiver_id"
       t.string "receiver_address"
-      t.string "receiver_address_type"
+      t.string "receiver_address_type", default: "id"
       t.datetime "claimed_at"
       t.boolean "claimed_by_server", default: false
       t.string "strategy", default: "code"

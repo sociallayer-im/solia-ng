@@ -10,7 +10,7 @@ class CreateVoteProposals < ActiveRecord::Migration[7.2]
       t.integer "eligibile_badge_class_id"
       t.integer "eligibile_point_id"
       t.string "verification"
-      t.string "status", default: "open", null: false, comment: "draft | open | closed | cancel"
+      t.string "status", default: "published", null: false, comment: "draft | published | closed | cancelled"
       t.boolean "show_voters"
       t.boolean "can_update_vote"
       t.integer "voter_count", default: 0
