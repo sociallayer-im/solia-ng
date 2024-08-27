@@ -96,7 +96,7 @@ class Api::VoteController < ApiController
   private
 
   def vote_proposal_params
-    params,require(:vote_proposal).permit(:title, :content, :show_voters, :max_choice,
+    params.require(:vote_proposal).permit(:title, :content, :show_voters, :max_choice,
           :eligibile_group_id, :eligibile_badge_class_id, :eligibile_point_id,
           :verification, :eligibility, :can_update_vote, :start_time, :end_time,
           vote_options_attributes: [ :id, :title, :link, :_destroy ]
