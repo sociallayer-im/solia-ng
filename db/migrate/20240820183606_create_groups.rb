@@ -11,6 +11,7 @@ class CreateGroups < ActiveRecord::Migration[7.2]
       t.string :tags, array: true
       t.string :event_taglist, array: true
       t.string :venue_taglist, array: true
+      t.boolean :group_ticket_enabled
       t.string :can_publish_event
       t.string :can_join_event
       t.string :can_view_event

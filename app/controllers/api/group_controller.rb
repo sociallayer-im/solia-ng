@@ -152,7 +152,7 @@ class Api::GroupController < ApiController
 
   def group_params
     params.require(:group).permit(
-          :chain, :image_url, :nickname, :about, :parent_id, :status,
+          :chain, :image_url, :nickname, :about, :parent_id, :status, :group_ticket_enabled,
           :tags, :event_taglist, :venue_taglist, :can_publish_event, :can_join_event, :can_view_event,
           :customizer, :logo_url, :banner_link_url, :banner_image_url,
           :timezone, :location, :metadata, :social_links,
