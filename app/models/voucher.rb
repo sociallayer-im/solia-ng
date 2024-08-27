@@ -6,5 +6,6 @@ class Voucher < ApplicationRecord
   has_many :badges
   has_many :activities, as: :item
 
+  validates :receiver_address_type, inclusion: { in: %w(id email address) }
   validates :strategy, inclusion: { in: %w(code account address event) }
 end
