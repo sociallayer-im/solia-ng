@@ -30,6 +30,7 @@ gem "sanitize"
 gem "awesome_print"
 gem "resend"
 gem "icalendar"
+gem "hash_diff"
 
 gem "aliyunsdkcore"
 gem "imagekitio"

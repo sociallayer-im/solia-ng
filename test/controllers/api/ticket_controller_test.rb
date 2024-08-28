@@ -57,5 +57,35 @@ class Api::TicketControllerTest < ActionDispatch::IntegrationTest
          params: { auth_token: auth_token, id: event.id, ticket_id: ticket.id, payment_method_id: nil }
     assert_response :success
   end
+
+  test "api#ticket/rsvp with crypto ticket" do
+    profile = Profile.find_by(handle: "cookie")
+    auth_token = profile.gen_auth_token
+    group = Group.find_by(handle: "guildx")
+
+    event = events(:with_ticket)
+    ticket = Ticket.find_by(event: event, title: 'crypto')
+    op_paymethod = PaymentMethod.find_by(item: ticket, chain: 'op')
+
+    post api_ticket_rsvp_url,
+         params: { auth_token: auth_token, id: event.id, ticket_id: ticket.id, payment_method_id: op_paymethod.id }
+    assert_response :success
+
+    ticket_item = TicketItem.find_by(event: event)
+    assert ticket_item.status == "pending"
+
+    ENV['NEXT_TOKEN'] = "VBNM"
+
+    post api_ticket_set_ticket_payment_status_url,
+         params: { next_token: ENV['NEXT_TOKEN'], chain: ticket_item.chain, product_id: event.id, item_id: ticket_item.order_number, amount: ticket_item.amount, txhash: "0x7890"}
+    assert_response :success
+
+    ticket_item.reload
+    assert ticket_item.txhash == "0x7890"
+    assert ticket_item.status == "succeeded"
+
+    # hash_diff = HashDiff::Comparison.new( ticket_item.as_json, ticket_item.reload.as_json )
+    # p hash_diff.diff
+  end
 end
 
