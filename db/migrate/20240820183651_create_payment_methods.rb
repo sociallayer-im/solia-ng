@@ -8,7 +8,7 @@ class CreatePaymentMethods < ActiveRecord::Migration[7.2]
       t.string "token_name"
       t.string "token_address"
       t.string "receiver_address"
-      t.integer "price"
+      t.decimal "price", precision: 40
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
     end

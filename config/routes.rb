@@ -43,6 +43,10 @@ Rails.application.routes.draw do
     post "event/check", to: "event#check"
     post "event/cancel", to: "event#cancel"
 
+    post "ticket/rsvp", to: "ticket#rsvp"
+    post "ticket/set_ticket_payment_status", to: "ticket#set_ticket_payment_status"
+    post "ticket/stripe_callback", to: "ticket#stripe_callback"
+
   end
 
   # Defines the root path route ("/")

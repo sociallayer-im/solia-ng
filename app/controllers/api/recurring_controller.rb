@@ -1,11 +1,10 @@
 class Api::RecurringController < ApiController
-
   def cancel_event
     profile = current_profile!
 
     events = Event.where(recurring_id: params[:recurring_id])
-    if params[:selector] == 'after'
-      events = events.where('id >= ?', params[:event_id])
+    if params[:selector] == "after"
+      events = events.where("id >= ?", params[:event_id])
     end
 
     # todo : check only once for each recurring

@@ -267,7 +267,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.string "token_name"
     t.string "token_address"
     t.string "receiver_address"
-    t.integer "price"
+    t.decimal "price", precision: 40
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -392,7 +392,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.integer "event_id"
     t.string "chain"
     t.string "txhash"
-    t.integer "amount"
     t.string "status"
     t.string "discount_value"
     t.string "discount_data"
@@ -404,7 +403,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_170124) do
     t.integer "group_id"
     t.integer "participant_id"
     t.integer "payment_method_id"
-    t.string "original_price"
+    t.decimal "amount", precision: 40
+    t.decimal "original_price", precision: 40
     t.integer "token_address"
     t.integer "receiver_address"
   end

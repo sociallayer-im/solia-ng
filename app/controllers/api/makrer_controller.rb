@@ -5,9 +5,9 @@ class Api::MakrerController < ApiController
 
     marker = Marker.new(marker_params)
     marker.update(
-    owner: profile,
-    group: group,
-    status: "normal"
+      owner: profile,
+      group: group,
+      status: "normal"
     )
     render json: { marker: marker.as_json }
   end

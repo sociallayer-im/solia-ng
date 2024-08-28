@@ -1,11 +1,27 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+one:
+  id: 1801
+  title: "free"
+  content: "free ticket"
+  ticket_type: "event"
+  event_id: 801
+  quantity: 5
+  status: "normal"
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+two:
+  id: 1802
+  title: "crypto"
+  content: "crypto ticket"
+  ticket_type: "event"
+  event_id: 801
+  quantity: 5
+  status: "normal"
+
+three:
+  id: 1803
+  title: "fiat"
+  content: "fiat ticket"
+  ticket_type: "event"
+  event_id: 801
+  quantity: 5
+  status: "normal"
+

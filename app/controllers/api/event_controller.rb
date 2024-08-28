@@ -17,6 +17,7 @@ class Api::EventController < ApiController
       raise AppError.new("group is empty")
     end
 
+    # todo : move badge_class to voucher
     if params[:badge_class_id]
       badge_class = BadgeClass.find(params[:badge_class_id])
       authorize badge_class, :send?
@@ -242,15 +243,15 @@ class Api::EventController < ApiController
       :title, :start_time, :end_time, :timezone, :meeting_url, :external_url,
       :venue_id, :location, :formatted_address, :location_viewport, :geo_lat, :geo_lng, :event_type,
       :cover_url, :require_approval, :extra, :content, :notes, :display, :operators, :max_participant, :min_participant,
-      :tags => [],
-      :extra => {},
-      tickets: [
+      tags: [],
+      extra: {},
+      tickets_attributes: [
         :title, :content, :check_badge_class_id, :quantity, :end_time, :need_approval,
         :payment_chain, :payment_token_name, :payment_token_address,
         :payment_target_address, :payment_token_price, :payment_metadata, :_destroy,
         payment_methods_attributes: [ :id, :chain, :kind, :token_name, :token_address, :receiver_address, :price, :_destroy ] ],
-      promo_codes: [ :id, :selector_type, :label, :code, :receiver_address, :discount_type, :discount, :applicable_ticket_ids, :ticket_item_ids, :expiry_time, :max_allowed_usages, :order_usage_count, :_destroy ],
-      event_roles: [ :id, :role, :group_id, :event_id, :profile_id, :email, :nickname, :image_url, :_destroy ],
+      promo_codes_attributes: [ :id, :selector_type, :label, :code, :receiver_address, :discount_type, :discount, :applicable_ticket_ids, :ticket_item_ids, :expiry_time, :max_allowed_usages, :order_usage_count, :_destroy ],
+      event_roles_attributes: [ :id, :role, :group_id, :event_id, :profile_id, :email, :nickname, :image_url, :_destroy ],
       )
   end
 end

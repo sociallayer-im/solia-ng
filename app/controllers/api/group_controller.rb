@@ -119,7 +119,6 @@ class Api::GroupController < ApiController
   def add_manager
     profile = Profile.find(params[:profile_id])
     group = Group.find(params[:group_id])
-    # authorize group, :own?, policy_class: GroupPolicy
     authorize group, :manage?, policy_class: GroupPolicy
 
     membership = Membership.find_by(profile_id: profile.id, group_id: group.id, role: %w[member operator])

@@ -3,7 +3,7 @@ class TicketItem < ApplicationRecord
   belongs_to :participant
   belongs_to :ticket
   belongs_to :event
-  belongs_to :payment_method
+  belongs_to :payment_method, optional: true
   belongs_to :group, optional: true
 
   validates :status, inclusion: { in: %w(pending succeeded cancelled) }

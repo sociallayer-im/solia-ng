@@ -6,7 +6,6 @@ class CreateTicketItems < ActiveRecord::Migration[7.2]
       t.integer "event_id"
       t.string "chain"
       t.string "txhash"
-      t.integer "amount"
       t.string "status"
       t.string "discount_value"
       t.string "discount_data"
@@ -18,7 +17,8 @@ class CreateTicketItems < ActiveRecord::Migration[7.2]
       t.integer "group_id"
       t.integer "participant_id"
       t.integer "payment_method_id"
-      t.string "original_price"
+      t.decimal "amount", precision: 40
+      t.decimal "original_price", precision: 40
       t.integer "token_address"
       t.integer "receiver_address"
     end

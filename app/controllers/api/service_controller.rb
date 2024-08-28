@@ -1,5 +1,4 @@
 class Api::ServiceController < ApiController
-
   def send_email
     code = rand(10_000..100_000)
     token = ProfileToken.create(context: params[:context], sent_to: params[:email], code: code)
