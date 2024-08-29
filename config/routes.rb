@@ -35,6 +35,14 @@ Rails.application.routes.draw do
     post "group/add_operator", to: "group#add_operator"
     post "group/leave", to: "group#leave"
 
+    post "group/send_invite", to: "group_invite#send_invite"
+    post "group/accept_invite", to: "group_invite#accept_invite"
+    post "group/cancel_invite", to: "group_invite#cancel_invite"
+    post "group/revoke_invite", to: "group_invite#revoke_invite"
+    post "group/request_invite", to: "group_invite#request_invite"
+    post "group/accept_request", to: "group_invite#accept_request"
+    post "group/send_invite_by_email", to: "group_invite#send_invite_by_email"
+
     post "event/create", to: "event#create"
     post "event/update", to: "event#update"
     post "event/unpublish", to: "event#unpublish"

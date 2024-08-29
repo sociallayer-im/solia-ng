@@ -267,4 +267,25 @@ class Api::GroupControllerTest < ActionDispatch::IntegrationTest
     assert_nil group.is_member(profile2.id)
   end
 
+  test "api#group/send_invite" do
+    profile = Profile.find_by(handle: "cookie")
+    profile2 = Profile.find_by(handle: "mooncake")
+    auth_token = profile.gen_auth_token
+    auth_token2 = profile2.gen_auth_token
+    group = Group.find_by(handle: "guildx")
+
+    post api_group_send_invite_url,
+      params: { auth_token: auth_token, group_id: group.id,
+      receivers: [profile2.handle], role: 'member', message: "welcome" }
+    assert_response :success
+
+    group_invite = GroupInvite.find_by(receiver: profile2)
+
+    post api_group_accept_invite_url, params: { auth_token: auth_token2, group_invite_id: group_invite.id }
+    assert_response :success
+    assert response.body == "{\"result\":\"ok\"}"
+
+    assert group.is_member(profile2.id)
+  end
+
 end
