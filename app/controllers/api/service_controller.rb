@@ -22,11 +22,12 @@ class Api::ServiceController < ApiController
     # todo : log username
     # todo : calculate filename from filehash
     # key = SecureRandom.hex(10)
+
     key = sha.hexdigest.slice(0...16)
     resp = $client.put_object({
       body: params[:data],
       bucket: "sola",
-      key: key,
+      key: key
     })
     render json: { result: resp.as_json, key: key, url: "#{ENV['S3_URL']}#{key}" }
   end

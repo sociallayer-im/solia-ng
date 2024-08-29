@@ -1,5 +1,5 @@
-Stripe.api_version = '2020-08-27'
-Stripe.api_key = ENV['STRIPE_APP_SECRET']
+Stripe.api_version = "2020-08-27"
+Stripe.api_key = ENV["STRIPE_APP_SECRET"]
 
 class Api::TicketController < ApiController
   def rsvp
@@ -142,7 +142,7 @@ class Api::TicketController < ApiController
       end
     end
 
-    return render json: { result: "ok" }
+    render json: { result: "ok" }
   end
 
   def stripe_client_secret
@@ -153,18 +153,18 @@ class Api::TicketController < ApiController
       return render json: { result: "error", message: "ticket_item not found" }
     end
 
-    if ticket_item.chain != 'stripe'
+    if ticket_item.chain != "stripe"
       return render json: { result: "error", message: "ticket_item is not for stripe" }
     end
 
     payment_intent = Stripe::PaymentIntent.create({
       amount: ticket_item.amount,
       automatic_payment_methods: { enabled: true },
-      currency: 'usd',
+      currency: "usd"
     })
     p payment_intent
     ticket_item.update(txhash: payment_intent.id)
-    return render json: { result: "ok", payment_intent_id: payment_intent.id, client_secret: payment_intent.client_secret }
+    render json: { result: "ok", payment_intent_id: payment_intent.id, client_secret: payment_intent.client_secret }
   end
 
   def check_promo_code
