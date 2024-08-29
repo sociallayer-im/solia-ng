@@ -19,6 +19,32 @@ class Event < ApplicationRecord
   accepts_nested_attributes_for :event_roles, allow_destroy: true
   accepts_nested_attributes_for :promo_codes, allow_destroy: true
 
+  ### methods
+
+  def to_cal
+    $SENDER_EMAIL = "send@app.sola.day"
+    $SOLA_HOST = "https://app.sola.day"
+    timezone = self.timezone
+
+    cal = Icalendar::Calendar.new
+    cal.event do |e|
+      e.dtstart     = Icalendar::Values::DateTime.new(self.start_time.in_time_zone(timezone))
+      e.dtend       = Icalendar::Values::DateTime.new(self.end_time.in_time_zone(timezone))
+      e.summary     = self.title || ""
+      e.description = self.content || ""
+      e.uid         = "sola-#{self.id}"
+      e.status      = "CONFIRMED"
+      # e.organizer   = Icalendar::Values::CalAddress.new("mailto:#{$SENDER_EMAIL}", cn: "sola")
+      # e.attendee    = ["mailto:#{params[:recipient]}"]
+      e.url         = "#{$SOLA_HOST}/event/detail/#{self.id}"
+      e.location    = "#{$SOLA_HOST}/event/detail/#{self.id}"
+    end
+
+    ics = cal.to_ical
+  end
+
+  ### legacy
+
   def timeinfo
     timezone = self.timezone
     start_time = self.start_time.in_time_zone(timezone).strftime('%b %d %H:%M %p')
