@@ -35,9 +35,9 @@ class Api::MakrerController < ApiController
   private
 
   def marker_params
-    params.require(:marker).permit(:marker_type, :category, :voucher_id, :pin_image_url, :cover_image_url,
-              :title, :about, :link, :location, :formatted_address, :location_viewport, :geo_lat, :geo_lng,
-              :start_time, :end_time, :highlight, :message,
+    params.require(:marker).permit(:marker_type, :category, :pin_image_url, :cover_image_url,
+              :title, :about, :link, :start_time, :end_time,
+              :location, :formatted_address, :location_viewport, :geo_lat, :geo_lng
             )
   end
 end
