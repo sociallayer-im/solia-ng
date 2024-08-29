@@ -1,3 +1,6 @@
+Stripe.api_version = '2020-08-27'
+Stripe.api_key = ENV['STRIPE_APP_SECRET']
+
 class Api::TicketController < ApiController
   def rsvp
     profile = current_profile!
@@ -34,8 +37,8 @@ class Api::TicketController < ApiController
       discount_data = nil
 
       if params[:promo_code].present?
-        promo_code = PromoCode.find_by(selector_type: "code", event_id: event.id, code: params[:promo_code])
-        amount, discount_value, discount_data = promo_code.get_discounted_price(params[:amount])
+        promo_code = PromoCode.find_by(selector: "code", event_id: event.id, code: params[:promo_code])
+        amount, discount_value, discount_data = promo_code.get_discounted_price(amount)
         if discount_value
           promo_code.increment!(:order_usage_count)
         end
@@ -82,7 +85,7 @@ class Api::TicketController < ApiController
     render json: { participant: participant.as_json, ticket_item: ticket_item.as_json }
   end
 
-  def set_ticket_payment_status
+  def set_payment_status
     unless params[:next_token] == ENV["NEXT_TOKEN"]
       raise AppError.new("invalid next token")
     end
@@ -131,17 +134,37 @@ class Api::TicketController < ApiController
       status = params["data"]["object"]["status"]
       ticket_item = TicketItem.find_by(txhash: intent_id)
       ticket_item.update(status: status)
-      p "ticket_item.participant"
-      p ticket_item.participant
       if ticket_item.participant.payment_status != "succeeded"
         ticket_item.participant.update(payment_status: status)
         if ticket_item.profile.email.present?
-          ticket_item.event.send_mail_new_event(ticket_item.profile.email)
+          # ticket_item.event.send_mail_new_event(ticket_item.profile.email)
         end
       end
     end
 
     return render json: { result: "ok" }
+  end
+
+  def stripe_client_secret
+    p "create payment_intent"
+    ticket_item = TicketItem.find(params[:ticket_item_id])
+
+    if !ticket_item
+      return render json: { result: "error", message: "ticket_item not found" }
+    end
+
+    if ticket_item.chain != 'stripe'
+      return render json: { result: "error", message: "ticket_item is not for stripe" }
+    end
+
+    payment_intent = Stripe::PaymentIntent.create({
+      amount: ticket_item.amount,
+      automatic_payment_methods: { enabled: true },
+      currency: 'usd',
+    })
+    p payment_intent
+    ticket_item.update(txhash: payment_intent.id)
+    return render json: { result: "ok", payment_intent_id: payment_intent.id, client_secret: payment_intent.client_secret }
   end
 
   def check_promo_code
@@ -156,7 +179,7 @@ class Api::TicketController < ApiController
   end
 
   def promo_code_price
-    promo_code = PromoCode.find_by(selector_type: "code", code: params[:promo_code])
+    promo_code = PromoCode.find_by(selector: "code", code: params[:promo_code])
     amount, discount_value, discount_data = promo_code.get_discounted_price(params[:amount])
     render json: { promo_code_id: promo_code.id, amount: amount }
   end

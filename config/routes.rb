@@ -44,8 +44,9 @@ Rails.application.routes.draw do
     post "event/cancel", to: "event#cancel"
 
     post "ticket/rsvp", to: "ticket#rsvp"
-    post "ticket/set_ticket_payment_status", to: "ticket#set_ticket_payment_status"
+    post "ticket/set_payment_status", to: "ticket#set_payment_status"
     post "ticket/stripe_callback", to: "ticket#stripe_callback"
+    post "ticket/stripe_client_secret", to: "ticket#stripe_client_secret"
 
   end
 

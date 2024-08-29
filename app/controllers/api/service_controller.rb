@@ -1,4 +1,5 @@
 require "aws-sdk-s3"
+require "digest"
 
 $client = Aws::S3::Client.new(
   access_key_id: "#{ENV['AWS_ACCESS_KEY_ID']}",
@@ -11,9 +12,17 @@ class Api::ServiceController < ApiController
   def upload_image
     profile = current_profile!
 
+    sha = Digest::SHA2.new
+    File.open(params[:data]) do |f|
+      while chunk = f.read(256)
+        sha << chunk
+      end
+    end
+
     # todo : log username
     # todo : calculate filename from filehash
-    key = SecureRandom.hex(10)
+    # key = SecureRandom.hex(10)
+    key = sha.hexdigest.slice(0...16)
     resp = $client.put_object({
       body: params[:data],
       bucket: "sola",
