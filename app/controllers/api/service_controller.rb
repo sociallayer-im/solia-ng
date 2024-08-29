@@ -1,4 +1,27 @@
+require "aws-sdk-s3"
+
+$client = Aws::S3::Client.new(
+  access_key_id: "#{ENV['AWS_ACCESS_KEY_ID']}",
+  secret_access_key: "#{ENV['AWS_SECRET_ACCESS_KEY']}",
+  endpoint: "https://#{ENV['AWS_HOST']}",
+  region: "auto",
+)
+
 class Api::ServiceController < ApiController
+  def upload_image
+    profile = current_profile!
+
+    # todo : log username
+    # todo : calculate filename from filehash
+    key = SecureRandom.hex(10)
+    resp = $client.put_object({
+      body: params[:data],
+      bucket: "sola",
+      key: key,
+    })
+    render json: { result: resp.as_json, key: key, url: "#{ENV['S3_URL']}#{key}" }
+  end
+
   def send_email
     code = rand(10_000..100_000)
     token = ProfileToken.create(context: params[:context], sent_to: params[:email], code: code)

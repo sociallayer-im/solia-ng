@@ -31,6 +31,7 @@ gem "awesome_print"
 gem "resend"
 gem "icalendar"
 gem "hash_diff"
+gem "aws-sdk-s3"
 
 gem "aliyunsdkcore"
 gem "imagekitio"
