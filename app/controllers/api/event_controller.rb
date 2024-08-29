@@ -89,7 +89,7 @@ class Api::EventController < ApiController
 
       if venue.require_approval && !group.is_manager(profile.id)
         status = "pending"
-        @send_approval_email_to_manager = true
+        send_approval_email_to_manager = true
       end
     end
 

@@ -1,12 +1,12 @@
 class Api::BadgeController < ApiController
   def meta
-    @badge = Badge.find(params[:id])
+    badge = Badge.find(params[:id])
 
     render json: {
       "name": "Social Layer",
-      "description": @badge.badge.title,
+      "description": badge.badge.title,
       "external_url": "https://app.sola.day", # need update
-      "image": @badge.badge_class.image_url,
+      "image": badge.badge_class.image_url,
       "attributes": []
     }
   end
@@ -20,17 +20,17 @@ class Api::BadgeController < ApiController
   def transfer
     profile = current_profile!
 
-    @badge = Badge.find(params[:badge_id])
-    @target = Profile.find_by(username: params[:target])
-    authorize @badge, :own?
+    badge = Badge.find(params[:badge_id])
+    target = Profile.find_by(username: params[:target])
+    authorize badge, :own?
 
     # need test
-    raise AppError.new("invalid state") unless @badge.status == "accepted"
-    raise AppError.new("invalid badge_type") if @badge.badge_class.transferable
-    raise AppError.new("invalid target id") if @target.nil? || profile.id == @target.id
+    raise AppError.new("invalid state") unless badge.status == "accepted"
+    raise AppError.new("invalid badge_type") if badge.badge_class.transferable
+    raise AppError.new("invalid target id") if target.nil? || profile.id == target.id
 
-    @badge.update(owner_id: params[:target_id])
-    @activity = Activity.create(item: @badge, initiator_id: profile.id, action: "badge/transfer", target_id: @target.id)
+    badge.update(owner_id: params[:target_id])
+    activity = Activity.create(item: badge, initiator_id: profile.id, action: "badge/transfer", target_id: target.id)
     render json: { result: "ok" }
   end
 
@@ -49,7 +49,7 @@ class Api::BadgeController < ApiController
 
     badge.decrement!(:value, params[:delta].to_i)
     badge.touch(:last_value_used_at)
-    @activity = Activity.create(item: @badge, initiator_id: profile.id, action: "badge/consume")
+    activity = Activity.create(item: badge, initiator_id: profile.id, action: "badge/consume")
 
     render json: { badge: badge }
   end
@@ -57,12 +57,12 @@ class Api::BadgeController < ApiController
   def burn
     profile = current_profile!
 
-    @badge = Badge.find(params[:badge_id])
-    authorize @badge, :own?
-    raise AppError.new("invalid state") unless @badge.status == "accepted"
+    badge = Badge.find(params[:badge_id])
+    authorize badge, :own?
+    raise AppError.new("invalid state") unless badge.status == "accepted"
 
-    @badge.update(status: "burned")
-    @activity = Activity.create(item: @badge, initiator_id: profile.id, action: "badge/burn")
+    badge.update(status: "burned")
+    activity = Activity.create(item: badge, initiator_id: profile.id, action: "badge/burn")
 
     render json: { result: "ok" }
   end

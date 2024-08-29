@@ -1,7 +1,7 @@
 class Api::ProfileController < ApiController
   def current
-    @profile = current_profile!
-    render json: @profile
+    profile = current_profile!
+    render json: profile
   end
 
   def nonce
