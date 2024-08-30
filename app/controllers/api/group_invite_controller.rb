@@ -82,6 +82,8 @@ class Api::GroupInviteController < ApiController
 
         # todo : update memberships_count
         # todo : membership uniqueness
+        # todo : test existing member and new member
+        # todo : test existing member with manager or owner role
       elsif receiver.include? "@"
 
         invite = GroupInvite.create(
